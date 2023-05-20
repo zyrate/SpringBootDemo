@@ -1,22 +1,46 @@
 package com.zyr.listener;
 
-import com.zyr.listener.event.Event;
+import com.zyr.listener.event.ListenerEvent;
+import com.zyr.listener.event.ListenerEventStarted;
+import com.zyr.listener.event.ListenerEventStopped;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ListenerBus {
-    private List<EventListener> listeners = new ArrayList<>();
+import org.springframework.stereotype.Component;
+@Component
+public class ListenerBus implements Runnable{
+    private ConcurrentHashMap<Integer, EventListener> listeners = new ConcurrentHashMap<>();
+    private ConcurrentLinkedQueue<ListenerEvent> queue = new ConcurrentLinkedQueue<>();
+    private boolean isStarted = false;
 
     public void addListener(EventListener listener){
-        listeners.add(listener);
+        listeners.put(listener.getListenerId(), listener);
     }
 
-    public void removeListener(EventListener listener){
-        listeners.remove(listener);
+    public void removeListenerById(Integer listenerId){
+        listeners.remove(listenerId);
     }
 
-    public void postEvent(EventListener listener, Event event){
+    public void handleEvent(EventListener listener, ListenerEvent event){
+        switch(event.eventName()){
+            case "Started": listener.onStarted((ListenerEventStarted) event); break;
+            case "Stopped": listener.onStopped((ListenerEventStopped) event); break;
+        }
+    }
 
+    public void postEvent(ListenerEvent event){
+        queue.offer(event);
+    }
+
+    @Override
+    public void run() {
+        isStarted = true;
+        while(isStarted){
+            ListenerEvent event = queue.poll();
+            for(EventListener listener : listeners.values()){
+                handleEvent(listener, event);
+            }
+        }
     }
 }
