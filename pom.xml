@@ -61,6 +61,25 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
+          <configuration>
+            <archive>
+              <addMavenDescriptor>true</addMavenDescriptor>
+              <manifest>
+                <useUniqueVersions>false</useUniqueVersions>
+                <addClasspath>true</addClasspath>
+                <classpathPrefix>lib/</classpathPrefix>
+              </manifest>
+              <manifestEntries>
+                <Class-Path>../config/</Class-Path>
+              </manifestEntries>
+            </archive>
+            <!-- jar包的位置 -->
+            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+            <includes>
+              <!-- 有时候可能需要一些其他文件，这边可以配置，包括剔除的文件等等 -->
+              <include>**/listener/**/*.class</include>
+            </includes>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>

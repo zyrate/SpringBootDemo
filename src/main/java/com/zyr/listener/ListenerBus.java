@@ -5,13 +5,13 @@ import com.zyr.listener.event.ListenerEventStarted;
 import com.zyr.listener.event.ListenerEventStopped;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.springframework.stereotype.Component;
 @Component
-public class ListenerBus implements Runnable{
+public class ListenerBus{
     private ConcurrentHashMap<Integer, EventListener> listeners = new ConcurrentHashMap<>();
-    private ConcurrentLinkedQueue<ListenerEvent> queue = new ConcurrentLinkedQueue<>();
+    private LinkedBlockingDeque<ListenerEvent> queue = new LinkedBlockingDeque();
     private boolean isStarted = false;
 
     public void addListener(EventListener listener){
@@ -30,17 +30,35 @@ public class ListenerBus implements Runnable{
     }
 
     public void postEvent(ListenerEvent event){
-        queue.offer(event);
+        try {
+            queue.put(event);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void run() {
+    public void start() {
         isStarted = true;
-        while(isStarted){
-            ListenerEvent event = queue.poll();
-            for(EventListener listener : listeners.values()){
-                handleEvent(listener, event);
+        new Thread(){
+            @Override
+            public void run() {
+                while(isStarted){
+                    ListenerEvent event;
+                    try {
+                        event = queue.take();
+                        for(EventListener listener : listeners.values()){
+                            handleEvent(listener, event);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    
+                }
             }
-        }
+        }.start();
+    }
+
+    public void stop(){
+        isStarted = false;
     }
 }

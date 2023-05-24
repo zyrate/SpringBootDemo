@@ -19,7 +19,7 @@ public class ListenerBusManager {
     }
 
     public void startHandling(){
-        listenerBus.run();
+        listenerBus.start();
     }
 
 }
