@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zyr.custom.MyListener;
+import com.zyr.listener.EventListener;
 import com.zyr.listener.ListenerBusManager;
 import com.zyr.listener.event.ListenerEventStarted;
 import com.zyr.listener.event.ListenerEventStopped;
+import com.zyr.util.Util;
 
 @Controller
 public class Test {
@@ -55,17 +57,9 @@ public class Test {
     //热加载
     @RequestMapping("/hotload")
     @ResponseBody
-    public String hotload(){
-        String pluginClass="com.example.demo.DemoHandler";
-        ClassLoader classLoader = ClassLoaderUtil.getClassLoader("file:/D:/demo-1.0.jar");
-
-        Class<?> clazz = classLoader.loadClass(pluginClass);
-
-        SpringUtil.registerBean("demoHandler",clazz);
-
-        IDemoHandler plugin = (IDemoHandler)SpringUtil.getBean("demoHandler");
-
-        String str= plugin.handler("RAY");
+    public String hotload() throws Exception{
+        EventListener myListener = (EventListener)Util.loadClassFromJar("file:///D:\\Desktop\\UserCustomTest.jar", "com.xxx.MyListener");
+        listenerBusManager.addListener(myListener);
         return "OK";
     }
 }
