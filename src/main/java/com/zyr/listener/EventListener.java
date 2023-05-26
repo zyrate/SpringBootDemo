@@ -1,15 +1,13 @@
 package com.zyr.listener;
 
-import com.zyr.listener.event.ListenerEventStarted;
-import com.zyr.listener.event.ListenerEventStopped;
+import com.zyr.listener.event.EventWorkflowSubmitted;
+import com.zyr.listener.event.EventTaskFinished;
 
-import lombok.Data;
-@Data
-public abstract class EventListener {
+public interface EventListener {
     
-    private int listenerId;
+    int getListenerId();
 
-    public abstract void onStarted(ListenerEventStarted listenerEventStarted);
+    void onWorkflowSubmitted(EventWorkflowSubmitted eventWorkflowSubmitted);
 
-    public abstract void onStopped(ListenerEventStopped listenerEventStopped);
+    void onTaskFinished(EventTaskFinished eventTaskFinished);
 }

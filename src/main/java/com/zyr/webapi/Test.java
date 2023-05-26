@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.zyr.custom.MyListener;
 import com.zyr.listener.EventListener;
 import com.zyr.listener.ListenerBusManager;
-import com.zyr.listener.event.ListenerEventStarted;
-import com.zyr.listener.event.ListenerEventStopped;
+import com.zyr.listener.event.EventWorkflowSubmitted;
+import com.zyr.listener.event.EventTaskFinished;
 import com.zyr.util.Util;
 
 @Controller
@@ -42,17 +42,30 @@ public class Test {
     @RequestMapping("/addlistener")
     @ResponseBody
     public void addListener(){
-        listenerBusManager.startHandling();
         listenerBusManager.addListener(new MyListener());
+    }
+
+    @RequestMapping("/start")
+    @ResponseBody
+    public void start(){
+        listenerBusManager.startBus();
+    }
+    
+    @RequestMapping("/stop")
+    @ResponseBody
+    public void stop(){
+        listenerBusManager.stopBus();
     }
     
 
     @RequestMapping("/post")
     @ResponseBody
     public void postEvent(){
-        listenerBusManager.postEvent(new ListenerEventStarted());
-        listenerBusManager.postEvent(new ListenerEventStopped());
+        listenerBusManager.postEvent(new EventWorkflowSubmitted());
+        listenerBusManager.postEvent(new EventTaskFinished());
     }
+
+
 
     //热加载
     @RequestMapping("/hotload")

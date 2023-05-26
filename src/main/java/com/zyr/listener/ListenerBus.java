@@ -1,8 +1,9 @@
 package com.zyr.listener;
 
 import com.zyr.listener.event.ListenerEvent;
-import com.zyr.listener.event.ListenerEventStarted;
-import com.zyr.listener.event.ListenerEventStopped;
+import com.zyr.listener.event.EventWorkflowSubmitted;
+import com.zyr.listener.event.EventStopListenerBus;
+import com.zyr.listener.event.EventTaskFinished;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -14,8 +15,22 @@ public class ListenerBus{
     private LinkedBlockingDeque<ListenerEvent> queue = new LinkedBlockingDeque();
     private boolean isStarted = false;
 
+    private Thread dispatchThread = null;
+
+    private void dispatch() throws InterruptedException{
+        System.out.println("ListenerBus started.");
+        ListenerEvent nextEvent = queue.take();
+        while(!nextEvent.getEventType().equals("STOP_LISTENERBUS")){
+            for(EventListener listener : listeners.values()){
+                handleEvent(listener, nextEvent);
+            }
+            nextEvent = queue.take();
+        }
+    }
+
     public void addListener(EventListener listener){
         listeners.put(listener.getListenerId(), listener);
+        System.out.println("Add listener "+listener.getListenerId()+" to ListenerBus.");
     }
 
     public void removeListenerById(Integer listenerId){
@@ -23,42 +38,50 @@ public class ListenerBus{
     }
 
     public void handleEvent(EventListener listener, ListenerEvent event){
-        switch(event.eventName()){
-            case "Started": listener.onStarted((ListenerEventStarted) event); break;
-            case "Stopped": listener.onStopped((ListenerEventStopped) event); break;
+        switch(event.getEventType()){
+            case "WORKFLOW_SUBMITTED": listener.onWorkflowSubmitted((EventWorkflowSubmitted) event); break;
+            case "TASK_FINISHED": listener.onTaskFinished((EventTaskFinished) event); break;
+            // and other event types...
         }
     }
 
     public void postEvent(ListenerEvent event){
-        try {
-            queue.put(event);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(isStarted) {
+            try {
+                queue.put(event);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void start() {
-        isStarted = true;
-        new Thread(){
-            @Override
-            public void run() {
-                while(isStarted){
-                    ListenerEvent event;
+    public void start(){
+        if(!isStarted){
+            isStarted = true;
+            dispatchThread = new Thread(){
+                @Override
+                public void run() {
                     try {
-                        event = queue.take();
-                        for(EventListener listener : listeners.values()){
-                            handleEvent(listener, event);
-                        }
+                        dispatch();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    
                 }
-            }
-        }.start();
+            };
+            dispatchThread.start();
+        }
     }
 
-    public void stop(){
-        isStarted = false;
+    public void stop() {
+        if(isStarted) {
+            postEvent(new EventStopListenerBus());
+            try {
+                dispatchThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            isStarted = false;
+            System.out.println("ListenerBus stopped.");
+        }
     }
 }

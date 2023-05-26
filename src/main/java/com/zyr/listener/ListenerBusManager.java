@@ -18,8 +18,12 @@ public class ListenerBusManager {
         listenerBus.postEvent(event);
     }
 
-    public void startHandling(){
+    public void startBus(){
         listenerBus.start();
+    }
+
+    public void stopBus(){
+        listenerBus.stop();
     }
 
 }

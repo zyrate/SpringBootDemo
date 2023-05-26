@@ -1,19 +1,23 @@
 package com.zyr.custom;
 
 import com.zyr.listener.EventListener;
-import com.zyr.listener.event.ListenerEventStarted;
-import com.zyr.listener.event.ListenerEventStopped;
+import com.zyr.listener.event.EventWorkflowSubmitted;
+import com.zyr.listener.event.EventTaskFinished;
 
-public class MyListener extends EventListener{
+public class MyListener implements EventListener{
 
     @Override
-    public void onStarted(ListenerEventStarted listenerEventStarted) {
-        System.out.println("Now the application is started!!!");
+    public int getListenerId() {
+        return 1001;
     }
 
     @Override
-    public void onStopped(ListenerEventStopped listenerEventStopped) {
-        System.out.println("Stopped !!!");
+    public void onWorkflowSubmitted(EventWorkflowSubmitted eventWorkflowSubmitted) {
+        System.out.println("Yes~ Workflow submitted!");
     }
-    
+
+    @Override
+    public void onTaskFinished(EventTaskFinished eventTaskFinished) {
+        System.out.println("Yes~ Task finished!");
+    }
 }
