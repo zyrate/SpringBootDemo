@@ -1,0 +1,11 @@
+com.zyr.SpringBootApp - Starting SpringBootApp using Java 1.8.0_291 on DESKTOP-Q25UBE7 with PID 3204 (D:\Documents\Projects\SpringBootDemo\target\classes started by zyr in D:\Documents\Projects\SpringBootDemo)
+com.zyr.SpringBootApp - No active profile set, falling back to 1 default profile: "default"
+o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+o.a.catalina.core.StandardService - Starting service [Tomcat]
+o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.65]
+o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 864 ms
+o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+com.zyr.SpringBootApp - Started SpringBootApp in 1.7 seconds (JVM running for 2.396)

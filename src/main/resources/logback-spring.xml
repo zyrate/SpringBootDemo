@@ -1,0 +1,44 @@
+<configuration scan="true" scanPeriod="10 seconds">
+    <!--<include resource="org/springframework/boot/logging/logback/base.xml"
+        /> -->
+    <contextName>Logback For Boss</contextName>
+    <!-- name的值是变量的名称，value的值时变量定义的值。通过定义的值会被插入到logger上下文中。定义变量后，可以使“${}”来使用变量。 -->
+    <property name="log.path" value="D:/Desktop/Temp/logback" />
+    <!-- 日志最大的历史 30天 -->
+    <property name="maxHistory" value="30" />
+
+
+    <!-- 控制台输出日志 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger-%msg%n</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- INFO级别日志 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/info.%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
+            <maxFileSize>10KB</maxFileSize>
+            <totalSizeCap>10KB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+        <append>true</append>
+    </appender>
+
+    <!-- root级别 DEBUG -->
+    <root level="INFO">
+        <!-- 文件输出 -->
+<!--        <appender-ref ref="STDOUT"/>-->
+    </root>
+    <logger name="com.zyr.webapi.LogTest" level="INFO">
+        <appender-ref ref="FILE"/>
+    </logger>
+</configuration>
